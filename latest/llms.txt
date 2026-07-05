@@ -1,0 +1,52 @@
+# ASPECT PRM Generation Context
+
+This documentation bundle supports generation, repair, and reverse-engineering
+of ASPECT `.prm` files.
+
+Target version: ASPECT stable docs plus repository examples. Replace this line
+with the exact ASPECT version you validate against.
+
+Primary sources:
+
+- ASPECT user documentation: https://aspect-documentation.readthedocs.io/en/stable/user/index.html
+- ASPECT source repository: https://github.com/geodynamics/aspect
+
+Primary goal:
+
+- generate valid ASPECT ParameterHandler input files
+- reverse-engineer source `.prm` files into reusable prompts
+- repair invalid or weak `.prm` files while preserving intent
+
+## Syntax Rules
+
+- [Syntax Guide](./syntax-guide.md): Minimal valid ASPECT ParameterHandler syntax.
+- [Structure Guide](./structure-guide.md): Typical section layout and nesting patterns.
+
+## Tasks
+
+- [Generate From Prompt](./tasks/generation.md): Convert a natural-language model description into a valid `.prm`.
+- [Reverse Engineer PRM](./tasks/reverse.md): Turn a source `.prm` into a concise regeneration prompt.
+- [Repair Invalid PRM](./tasks/repair.md): Rewrite malformed output into valid ASPECT syntax.
+
+## Core Documentation
+
+- [Parameter File Structure](./docs/parameter-file-structure.md): The main layout used by ASPECT parameter files.
+- [Parameter Documentation Index](./docs/parameter-documentation-index.md): Important configurable areas and where to look first.
+- [Feature Areas](./docs/feature-areas.md): Common physics and setup categories for retrieval and routing.
+- [Common Validation Traps](./docs/common-validation-traps.md): Frequent ASPECT generation failures caused by invalid parameter names or invented schemas.
+- [Annulus And Spherical Shell Notes](./docs/annulus-shell-notes.md): Source-aligned guidance for spherical shell and annulus-style examples in this bundle.
+
+## Examples
+
+- [Cookbook Examples Index](./examples/cookbooks-index.md): Real model examples from official ASPECT cookbooks.
+- [Benchmark Examples Index](./examples/benchmarks-index.md): Benchmark-oriented examples and validation cases.
+- [Test Examples Index](./examples/tests-index.md): Small targeted cases useful for syntax and section patterns.
+- [Roundtrip Examples Index](./examples/roundtrip-index.md): Source `.prm` -> reverse prompt -> regenerated `.prm` workflow references.
+
+## Constraints
+
+- Final generated `.prm` output must use strict ASPECT ParameterHandler syntax.
+- Every parameter line must begin with `set `.
+- Subsections must use `subsection <name>` and end with `end`.
+- Do not emit JSON, YAML, Markdown, code fences, or prose in final `.prm` output.
+- Prefer patterns that match official ASPECT examples for the target version.

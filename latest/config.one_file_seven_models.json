@@ -1,0 +1,53 @@
+{
+  "run_name": "roundtrip_annulus_7models",
+  "key_file": "key.txt",
+  "models": [
+    "anthropic/claude-3-haiku",
+    "anthropic/claude-3.5-haiku",
+    "openai/gpt-4o",
+    "openai/gpt-4o-mini",
+    "meta-llama/llama-3.1-8b-instruct",
+    "deepseek/deepseek-v3.2",
+    "qwen/qwen3-32b"
+  ],
+  "source_dir": "source_prm_dataset/files",
+  "source_glob": "*.prm",
+  "source_files": [
+    "source_prm_dataset/files/2d_annulus_visualization__2d_annulus_example.prm"
+  ],
+  "max_files": 1,
+  "output_dir": "runs",
+  "temperature": 0.2,
+  "timeout_seconds": 180,
+  "max_attempts": 3,
+  "retry_delay_seconds": 3.0,
+  "request_delay_seconds": 1.0,
+  "validation_image": "geodynamics/aspect:latest",
+  "validation_timeout_seconds": 180,
+  "max_validation_retries": 3,
+  "context_extensions": [
+    ".md",
+    ".txt"
+  ],
+  "context_include_paths": [
+    "llms.txt",
+    "syntax-guide.md",
+    "structure-guide.md",
+    "README.md",
+    "README_FILES.md",
+    "metric-explainer.md",
+    "tasks/generation.md",
+    "tasks/reverse.md",
+    "tasks/repair.md",
+    "docs/parameter-file-structure.md",
+    "docs/parameter-documentation-index.md",
+    "docs/feature-areas.md",
+    "docs/common-validation-traps.md",
+    "docs/annulus-shell-notes.md",
+    "examples/cookbooks-index.md",
+    "examples/benchmarks-index.md",
+    "examples/tests-index.md",
+    "examples/roundtrip-index.md"
+  ],
+  "context_max_chars": 120000
+}

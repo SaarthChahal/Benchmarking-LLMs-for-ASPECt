@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Explainable Text-to-Circuit (X-T2C) Poster</title>
+  <style>
+    :root {
+      --bg: #07111e;
+      --bg2: #0d1f33;
+      --paper: rgba(248, 251, 255, 0.97);
+      --ink: #102033;
+      --muted: #607187;
+      --navy: #123053;
+      --teal: #177b7c;
+      --teal-2: #3aa9a6;
+      --amber: #f2b544;
+      --coral: #d96d5f;
+      --line: rgba(16, 32, 51, 0.11);
+      --shadow: 0 28px 80px rgba(0, 0, 0, 0.28);
+      --card-shadow: 0 16px 34px rgba(9, 18, 34, 0.10);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background:
+        radial-gradient(circle at 12% 8%, rgba(58, 169, 166, 0.24), transparent 20%),
+        radial-gradient(circle at 88% 12%, rgba(242, 181, 68, 0.18), transparent 18%),
+        radial-gradient(circle at 50% 100%, rgba(15, 39, 71, 0.32), transparent 30%),
+        linear-gradient(180deg, var(--bg), var(--bg2));
+      color: var(--ink);
+      font-family: "Aptos", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.08), transparent 28%),
+        linear-gradient(315deg, rgba(255, 255, 255, 0.05), transparent 26%);
+      mix-blend-mode: screen;
+      opacity: 0.35;
+    }
+
+    .poster {
+      width: min(1600px, calc(100vw - 40px));
+      margin: 20px auto;
+      padding: 28px;
+      border-radius: 34px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(247, 250, 253, 0.95)),
+        radial-gradient(circle at top right, rgba(58, 169, 166, 0.08), transparent 26%),
+        radial-gradient(circle at bottom left, rgba(242, 181, 68, 0.08), transparent 22%);
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .poster::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(120deg, rgba(18, 48, 83, 0.03), transparent 24%),
+        linear-gradient(300deg, rgba(23, 123, 124, 0.03), transparent 28%);
+      pointer-events: none;
+    }
+
+    .hero,
+    .kpis,
+    .content-grid,
+    .footer-grid {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.65fr 0.95fr;
+      gap: 18px;
+      align-items: stretch;
+      margin-bottom: 18px;
+    }
+
+    .hero-copy,
+    .hero-meta,
+    .panel,
+    .stat,
+    .chip,
+    .info-card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      box-shadow: var(--card-shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    .hero-copy {
+      border-radius: 30px;
+      padding: 28px 30px 26px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-copy::after {
+      content: "";
+      position: absolute;
+      right: -90px;
+      top: -100px;
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(23, 123, 124, 0.16), transparent 68%);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+      color: var(--teal);
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .eyebrow span {
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--teal), var(--amber));
+      display: inline-block;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      max-width: 13ch;
+      font-size: clamp(40px, 3.4vw, 64px);
+      line-height: 0.96;
+      letter-spacing: -0.05em;
+      color: var(--navy);
+    }
+
+    .subtitle {
+      margin: 0;
+      max-width: 62ch;
+      font-size: 18px;
+      line-height: 1.55;
+      color: var(--muted);
+    }
+
+    .subtitle strong {
+      color: var(--ink);
+    }
+
+    .hero-note {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .note {
+      border-radius: 18px;
+      padding: 14px 15px;
+      background: linear-gradient(180deg, rgba(18, 48, 83, 0.04), rgba(23, 123, 124, 0.02));
+      border: 1px solid rgba(16, 32, 51, 0.08);
+    }
+
+    .note strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 14px;
+      color: var(--navy);
+    }
+
+    .note span {
+      font-size: 13px;
+      line-height: 1.4;
+      color: var(--muted);
+    }
+
+    .hero-meta {
+      border-radius: 30px;
+      padding: 22px;
+      display: grid;
+      gap: 12px;
+      align-content: start;
+    }
+
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .meta-row:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .meta-label {
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--muted);
+    }
+
+    .meta-value {
+      font-size: 18px;
+      font-weight: 900;
+      text-align: right;
+      color: var(--navy);
+      line-height: 1.15;
+    }
+
+    .meta-value small {
+      display: block;
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 700;
+      margin-top: 4px;
+    }
+
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .stat {
+      border-radius: 22px;
+      padding: 16px 16px 15px;
+      min-height: 124px;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(245, 248, 252, 0.97));
+    }
+
+    .stat::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, var(--teal), var(--amber));
+    }
+
+    .stat .label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-weight: 800;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .stat .value {
+      font-size: clamp(28px, 2.35vw, 46px);
+      line-height: 0.95;
+      letter-spacing: -0.05em;
+      font-weight: 900;
+      color: var(--navy);
+    }
+
+    .stat .sub {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.38;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .panel {
+      border-radius: 28px;
+      padding: 22px 22px 20px;
+      overflow: hidden;
+    }
+
+    .panel h2 {
+      margin: 0 0 10px;
+      font-size: 22px;
+      line-height: 1.08;
+      letter-spacing: -0.035em;
+      color: var(--navy);
+    }
+
+    .panel-subtitle {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 14px;
+      color: var(--muted);
+      font-size: 12px;
+      align-items: center;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .swatch {
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      display: inline-block;
+      flex: 0 0 auto;
+    }
+
+    .swatch.teal { background: linear-gradient(180deg, var(--teal), var(--teal-2)); }
+    .swatch.amber { background: linear-gradient(180deg, var(--amber), #e7a72f); }
+    .swatch.coral { background: linear-gradient(180deg, var(--coral), #ef8f80); }
+
+    .chart {
+      display: grid;
+      gap: 14px;
+    }
+
+    .chart-row {
+      display: grid;
+      grid-template-columns: 250px 1fr 104px;
+      gap: 14px;
+      align-items: center;
+      font-size: 13px;
+    }
+
+    .chart-label {
+      color: var(--ink);
+      font-weight: 800;
+      line-height: 1.18;
+    }
+
+    .chart-sub {
+      margin-top: 4px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.35;
+      font-weight: 600;
+    }
+
+    .chart-track {
+      position: relative;
+      height: 18px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(18, 48, 83, 0.08), rgba(23, 123, 124, 0.05));
+      overflow: hidden;
+      border: 1px solid rgba(16, 32, 51, 0.08);
+    }
+
+    .chart-bar {
+      position: absolute;
+      inset: 0 auto 0 0;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--teal), var(--teal-2));
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+    }
+
+    .chart-bar.alt {
+      background: linear-gradient(90deg, var(--amber), #e4a232);
+      opacity: 0.88;
+    }
+
+    .chart-value {
+      text-align: right;
+      font-weight: 900;
+      color: var(--navy);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .right-stack {
+      display: grid;
+      gap: 18px;
+    }
+
+    .callouts {
+      display: grid;
+      gap: 12px;
+    }
+
+    .callout {
+      border-radius: 18px;
+      padding: 14px 16px;
+      background: linear-gradient(180deg, rgba(18, 48, 83, 0.035), rgba(23, 123, 124, 0.02));
+      border: 1px solid rgba(16, 32, 51, 0.08);
+    }
+
+    .callout strong {
+      display: block;
+      color: var(--navy);
+      font-size: 14px;
+      margin-bottom: 5px;
+    }
+
+    .callout span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .attempts {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .chip {
+      border-radius: 18px;
+      padding: 14px 14px 13px;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid rgba(16, 32, 51, 0.08);
+    }
+
+    .chip .big {
+      font-size: 28px;
+      line-height: 1;
+      font-weight: 900;
+      letter-spacing: -0.05em;
+      color: var(--navy);
+    }
+
+    .chip .small {
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 18px;
+    }
+
+    .info-card {
+      border-radius: 28px;
+      padding: 22px;
+    }
+
+    .info-card.dark {
+      background: linear-gradient(180deg, rgba(15, 39, 71, 0.97), rgba(10, 27, 46, 0.99));
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #edf5ff;
+    }
+
+    .info-card h3 {
+      margin: 0 0 12px;
+      font-size: 19px;
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+    }
+
+    .info-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .info-card.dark p,
+    .info-card.dark li {
+      color: rgba(237, 245, 255, 0.92);
+    }
+
+    .info-card ul {
+      margin: 0;
+      padding-left: 18px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .info-card li {
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .source code {
+      background: rgba(18, 48, 83, 0.06);
+      padding: 2px 6px;
+      border-radius: 8px;
+      color: var(--navy);
+      word-break: break-all;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(18, 48, 83, 0.06);
+      color: var(--navy);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .mini-grid {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .mini {
+      border-radius: 16px;
+      padding: 12px 14px;
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid rgba(16, 32, 51, 0.08);
+    }
+
+    .mini .kicker {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-weight: 800;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .mini .data {
+      font-size: 21px;
+      line-height: 1;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      color: var(--navy);
+    }
+
+    .mini .desc {
+      margin-top: 6px;
+      font-size: 12px;
+      line-height: 1.35;
+      color: var(--muted);
+    }
+
+    .accent-line {
+      height: 4px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--teal), var(--amber), var(--coral));
+      margin-bottom: 14px;
+    }
+
+    @media (max-width: 1280px) {
+      .hero,
+      .content-grid,
+      .footer-grid,
+      .kpis {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-note,
+      .attempts,
+      .mini-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .chart-row {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      .chart-value {
+        text-align: left;
+      }
+    }
+
+    @media print {
+      body {
+        background: white;
+      }
+
+      .poster {
+        width: 100%;
+        margin: 0;
+        border-radius: 0;
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="poster">
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow"><span></span>Research Poster</div>
+        <h1>Explainable Text-to-Circuit (X-T2C): staged validation and repair for SPICE circuits</h1>
+        <p class="subtitle">
+          X-T2C maps natural-language circuit specs into SPICE-compatible designs through entity extraction,
+          complexity-aware clarification, component resolution, schema generation, netlist construction, simulation,
+          validation, and explanation. The benchmark compares a staged pipeline against direct prompting across
+          transistor and strict-ngspice circuit families.
+        </p>
+        <div class="hero-note">
+          <div class="note">
+            <strong>Closed-loop generation</strong>
+            <span>Extract, resolve, generate, simulate, and repair until the circuit is physically valid.</span>
+          </div>
+          <div class="note">
+            <strong>Direct baseline</strong>
+            <span>One-shot schema generation without the staged extraction and validation loop.</span>
+          </div>
+          <div class="note">
+            <strong>What matters</strong>
+            <span>Pass rate, physics plausibility, topology fidelity, and component/value correctness.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-meta">
+        <div class="accent-line"></div>
+        <div class="meta-row">
+          <div class="meta-label">Project</div>
+          <div class="meta-value">X-T2C<small>Explainable Text-to-Circuit</small></div>
+        </div>
+        <div class="meta-row">
+          <div class="meta-label">Main benchmarks</div>
+          <div class="meta-value">120 + 240 runs<small>transistor and strict-ngspice suites</small></div>
+        </div>
+        <div class="meta-row">
+          <div class="meta-label">Latest result files</div>
+          <div class="meta-value">comparison JSON<small>transistor_prompt and broad_ngspice</small></div>
+        </div>
+        <div class="meta-row">
+          <div class="meta-label">Run date</div>
+          <div class="meta-value">2026-03-29<small>latest completed artifact set</small></div>
+        </div>
+        <div class="mini-grid">
+          <div class="mini">
+            <div class="kicker">Pipeline</div>
+            <div class="data">80.0%</div>
+            <div class="desc">Pass rate on transistor comparison.</div>
+          </div>
+          <div class="mini">
+            <div class="kicker">Direct</div>
+            <div class="data">61.7%</div>
+            <div class="desc">Pass rate on the same benchmark.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="kpis">
+      <div class="stat">
+        <div class="label">Broad runs</div>
+        <div class="value">240</div>
+        <div class="sub">20 prompts x 6 model pairs x 2 methods in the strict-ngspice suite.</div>
+      </div>
+      <div class="stat">
+        <div class="label">Transistor runs</div>
+        <div class="value">120</div>
+        <div class="sub">BJT and MOSFET families across the model-pair comparison.</div>
+      </div>
+      <div class="stat">
+        <div class="label">Pipeline pass</div>
+        <div class="value">96.7%</div>
+        <div class="sub">Broad ngspice benchmark, or 116 of 120 runs.</div>
+      </div>
+      <div class="stat">
+        <div class="label">Direct pass</div>
+        <div class="value">55.8%</div>
+        <div class="sub">Broad ngspice benchmark, or 67 of 120 runs.</div>
+      </div>
+      <div class="stat">
+        <div class="label">Pipeline PPS</div>
+        <div class="value">0.9627</div>
+        <div class="sub">Average physics plausibility score in the broad suite.</div>
+      </div>
+      <div class="stat">
+        <div class="label">Transistor gain</div>
+        <div class="value">+18.3</div>
+        <div class="sub">Pipeline minus direct pass rate in percentage points.</div>
+      </div>
+    </section>
+
+    <section class="content-grid">
+      <article class="panel">
+        <h2>Model pair leaderboard</h2>
+        <p class="panel-subtitle">
+          Higher is better for pass rate and PPS. The staged pipeline is consistently ahead of direct prompting, with
+          the largest gains in the strongest cross-model pairing.
+        </p>
+        <div class="legend">
+          <span class="legend-item"><i class="swatch teal"></i>Pipeline pass rate</span>
+          <span class="legend-item"><i class="swatch amber"></i>Direct pass rate</span>
+        </div>
+        <div id="pair-chart" class="chart"></div>
+      </article>
+
+      <aside class="right-stack">
+        <article class="panel">
+          <h2>Key findings</h2>
+          <p class="panel-subtitle">
+            The evaluation favors staged generation when the output must compile, simulate, and preserve circuit
+            intent instead of just looking plausible as text.
+          </p>
+          <div class="callouts">
+            <div class="callout">
+              <strong>Best overall pairing</strong>
+              <span><strong>LLaMA-3.1-8B / LLaMA-3.1-70B</strong> reached 100.0% pass rate and 0.9973 PPS in the transistor comparison.</span>
+            </div>
+            <div class="callout">
+              <strong>Hardest family</strong>
+              <span><strong>BJT</strong> circuits were much harder than MOSFET switches: 60.0% vs 26.7% pipeline vs direct pass rate.</span>
+            </div>
+            <div class="callout">
+              <strong>Most robust family</strong>
+              <span><strong>MOSFET</strong> circuits stayed near perfect, with 100.0% pipeline pass rate and 96.7% direct pass rate.</span>
+            </div>
+            <div class="callout">
+              <strong>Big picture</strong>
+              <span>Simulation-grounded repair matters more than one-shot text generation for physically valid circuit synthesis.</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel">
+          <h2>Method ladder</h2>
+          <p class="panel-subtitle">
+            The staged workflow gives the model an opportunity to correct errors before simulation.
+          </p>
+          <div class="attempts">
+            <div class="chip">
+              <div class="big">1</div>
+              <div class="small">entity extraction and spec parsing</div>
+            </div>
+            <div class="chip">
+              <div class="big">2</div>
+              <div class="small">component resolution and clarification</div>
+            </div>
+            <div class="chip">
+              <div class="big">3</div>
+              <div class="small">schema, netlist, simulation, repair</div>
+            </div>
+          </div>
+        </article>
+      </aside>
+    </section>
+
+    <section class="footer-grid">
+      <article class="panel">
+        <h2>Family difficulty</h2>
+        <p class="panel-subtitle">
+          The pipeline benefits are biggest when the model must preserve topology and operating values under simulation.
+        </p>
+        <div class="legend">
+          <span class="legend-item"><i class="swatch teal"></i>Pipeline pass rate</span>
+          <span class="legend-item"><i class="swatch coral"></i>Direct pass rate</span>
+        </div>
+        <div id="family-chart" class="chart"></div>
+      </article>
+
+      <article class="info-card dark">
+        <h3>Interpretation</h3>
+        <ul>
+          <li><strong>Validation beats text-only plausibility.</strong> A circuit can read well in text while still failing simulation or value constraints.</li>
+          <li><strong>BJT amplifiers are more fragile.</strong> They are more sensitive to topology and biasing mistakes than MOSFET switches.</li>
+          <li><strong>The pipeline helps most where the task is hardest.</strong> The staged flow is not just safer, it is measurably better in the low-pass and transistor families.</li>
+        </ul>
+      </article>
+    </section>
+
+    <section style="margin-top: 18px;" class="footer-grid">
+      <article class="info-card source">
+        <h3>Data source</h3>
+        <p>
+          Built from <code>C:\Users\mohdw\OneDrive\Desktop\PSENTI\Anees\Full\Full\x_t2c\output\transistor_prompt_comparison_latest.json</code>
+          and <code>C:\Users\mohdw\OneDrive\Desktop\PSENTI\Anees\Full\Full\x_t2c\output\broad_ngspice_eval_latest.json</code>.
+          The latest runs were generated on 2026-03-29.
+        </p>
+        <div class="pill-row">
+          <span class="pill">SPICE circuits</span>
+          <span class="pill">Simulation-grounded</span>
+          <span class="pill">Pipeline vs direct</span>
+          <span class="pill">XAI-aware evaluation</span>
+          <span class="pill">120 + 240 runs</span>
+        </div>
+      </article>
+
+      <article class="info-card">
+        <h3>Summary lens</h3>
+        <div class="mini-grid" style="margin-top: 0;">
+          <div class="mini">
+            <div class="kicker">Best pair</div>
+            <div class="data">100%</div>
+            <div class="desc">LLaMA-3.1-8B / LLaMA-3.1-70B pipeline pass rate.</div>
+          </div>
+          <div class="mini">
+            <div class="kicker">Best PPS</div>
+            <div class="data">0.9973</div>
+            <div class="desc">Same pairing on the transistor comparison.</div>
+          </div>
+          <div class="mini">
+            <div class="kicker">Hardest family</div>
+            <div class="data">BJT</div>
+            <div class="desc">60.0% pipeline vs 26.7% direct pass rate.</div>
+          </div>
+          <div class="mini">
+            <div class="kicker">Most robust</div>
+            <div class="data">MOSFET</div>
+            <div class="desc">100.0% pipeline pass rate, 96.7% direct pass rate.</div>
+          </div>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    const pairData = [
+      { name: "LLaMA-3.1-8B / LLaMA-3.1-70B", pipeline: 1.0, direct: 0.4, subtext: "PPS 0.9973 vs 0.9173 | 10 prompts" },
+      { name: "GPT-4o-mini / GPT-4o", pipeline: 0.9, direct: 0.6, subtext: "PPS 0.9643 vs 0.9227 | 10 prompts" },
+      { name: "GPT-4o / GPT-4o", pipeline: 0.8, direct: 0.6, subtext: "PPS 0.9657 vs 0.9227 | 10 prompts" },
+      { name: "Claude-3.5-Haiku / Claude-3.5-Sonnet", pipeline: 0.7, direct: 0.6, subtext: "PPS 0.9407 vs 0.9309 | 10 prompts" },
+      { name: "Claude-3-Haiku / Claude-3.5-Sonnet", pipeline: 0.7, direct: 0.7, subtext: "PPS 0.9390 vs 0.9512 | 10 prompts" },
+      { name: "GPT-4o-mini / GPT-4o-mini", pipeline: 0.7, direct: 0.6, subtext: "PPS 0.9337 vs 0.9313 | 10 prompts" }
+    ];
+
+    const familyData = [
+      { name: "BJT family", pipeline: 0.6, direct: 0.2667, subtext: "PPS 0.9147 vs 0.8654 | 30 runs" },
+      { name: "MOSFET family", pipeline: 1.0, direct: 0.9667, subtext: "PPS 0.9989 vs 0.9933 | 30 runs" },
+      { name: "Transistor benchmark overall", pipeline: 0.8, direct: 0.6167, subtext: "PPS 0.9568 vs 0.9293 | 60 runs" },
+      { name: "Broad ngspice overall", pipeline: 0.9667, direct: 0.5583, subtext: "PPS 0.9627 vs 0.8833 | 240 runs" }
+    ];
+
+    function escapeHtml(text) {
+      return text
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;");
+    }
+
+    function renderChart(containerId, rows, options = {}) {
+      const el = document.getElementById(containerId);
+      const maxValue = options.maxValue || 1;
+      const secondaryClass = options.secondaryClass || "alt";
+
+      el.innerHTML = rows.map((row) => {
+        const primaryWidth = Math.max(2, Math.min(100, (row.pipeline / maxValue) * 100));
+        const secondaryWidth = Math.max(2, Math.min(100, (row.direct / maxValue) * 100));
+        return `
+          <div class="chart-row">
+            <div class="chart-label">${escapeHtml(row.name)}<div class="chart-sub">${escapeHtml(row.subtext)}</div></div>
+            <div class="chart-track" aria-hidden="true">
+              <div class="chart-bar" style="width:${primaryWidth}%;"></div>
+              <div class="chart-bar ${secondaryClass}" style="width:${secondaryWidth}%; opacity:0.76; top:4px; height:10px;"></div>
+            </div>
+            <div class="chart-value">${(row.pipeline * 100).toFixed(1)}% / ${(row.direct * 100).toFixed(1)}%</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    renderChart("pair-chart", pairData);
+    renderChart("family-chart", familyData);
+  </script>
+</body>
+</html>
